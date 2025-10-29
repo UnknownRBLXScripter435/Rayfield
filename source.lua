@@ -2088,53 +2088,41 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Button.Title.Text = ButtonSettings.Name
 			Button.Visible = true
 			Button.Parent = TabPage
-			Button.ClipsDescendants = true
 		
 			Button.BackgroundTransparency = 1
 			Button.UIStroke.Transparency = 1
 			Button.Title.TextTransparency = 1
 		
-			local Sample = Instance.new("ImageLabel")
-			Sample.Name = "Sample"
-			Sample.Parent = Button
-			Sample.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Sample.BackgroundTransparency = 1
-			Sample.Image = "http://www.roblox.com/asset/?id=4560909609"
-			Sample.ImageColor3 = SelectedTheme.ElementBackgroundHover
-			Sample.ImageTransparency = 1
-			Sample.Size = UDim2.new(0, 0, 0, 0)
-			Sample.AnchorPoint = Vector2.new(0.5, 0.5)
-			Sample.ZIndex = 5
-		
 			TweenService:Create(Button, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 			TweenService:Create(Button.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
 			TweenService:Create(Button.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
 		
-			Button.MouseButton1Down:Connect(function()
-				local mouse = game:GetService("Players").LocalPlayer:GetMouse()
-				local absolutePos = Button.AbsolutePosition
-				local absoluteSize = Button.AbsoluteSize
-				
-				local x = (mouse.X - absolutePos.X) / absoluteSize.X
-				local y = (mouse.Y - absolutePos.Y) / absoluteSize.Y
-				
-				local ripple = Sample:Clone()
-				ripple.Parent = Button
-				ripple.ImageTransparency = 0.6
-				ripple.Position = UDim2.new(x, 0, y, 0)
-				ripple.Size = UDim2.new(0, 0, 0, 0)
-				
-				local maxSize = math.max(absoluteSize.X, absoluteSize.Y) * 1.2
-				local targetSize = UDim2.new(0, maxSize, 0, maxSize)
-				local targetPosition = UDim2.new(x, -maxSize/2, y, -maxSize/2)
-				
-				TweenService:Create(ripple, TweenInfo.new(0.6, Enum.EasingStyle.Quart), {
-					Size = targetSize,
-					Position = targetPosition,
+			local function CreateRipple(buttonElement, position)
+				local Ripple = Instance.new("ImageLabel")
+				Ripple.Name = "Ripple"
+				Ripple.Image = "http://www.roblox.com/asset/?id=4560909609"
+				Ripple.BackgroundTransparency = 1
+				Ripple.ImageColor3 = SelectedTheme.ElementBackgroundHover
+				Ripple.ImageTransparency = 0.6
+				Ripple.Size = UDim2.new(0, 0, 0, 0)
+				Ripple.Position = UDim2.new(0, position.X - buttonElement.AbsolutePosition.X, 0, position.Y - buttonElement.AbsolutePosition.Y)
+				Ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+				Ripple.ZIndex = 5
+				Ripple.Parent = buttonElement
+		
+				local maxSize = math.max(buttonElement.AbsoluteSize.X, buttonElement.AbsoluteSize.Y) * 2
+				TweenService:Create(Ripple, TweenInfo.new(0.6, Enum.EasingStyle.Quart), {
+					Size = UDim2.new(0, maxSize, 0, maxSize),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
 					ImageTransparency = 1
 				}):Play()
-				
-				game:GetService("Debris"):AddItem(ripple, 0.6)
+		
+				game:GetService("Debris"):AddItem(Ripple, 0.6)
+			end
+		
+			Button.MouseButton1Down:Connect(function()
+				local mouse = game:GetService("Players").LocalPlayer:GetMouse()
+				CreateRipple(Button, Vector2.new(mouse.X, mouse.Y))
 			end)
 		
 			Button.Interact.MouseButton1Click:Connect(function()
@@ -2169,13 +2157,13 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end)
 		
 			Button.MouseEnter:Connect(function()
-				TweenService:Create(Button, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
-				TweenService:Create(Button.ElementIndicator, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 0.7}):Play()
+				TweenService:Create(Button, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
+				TweenService:Create(Button.ElementIndicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 0.7}):Play()
 			end)
 		
 			Button.MouseLeave:Connect(function()
-				TweenService:Create(Button, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
-				TweenService:Create(Button.ElementIndicator, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 0.9}):Play()
+				TweenService:Create(Button, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+				TweenService:Create(Button.ElementIndicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 0.9}):Play()
 			end)
 		
 			function ButtonValue:Set(NewButton)
@@ -2185,7 +2173,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 		
 			return ButtonValue
 		end
-
+		
 		-- ColorPicker
 		function Tab:CreateColorPicker(ColorPickerSettings) -- by Throit
 			ColorPickerSettings.Type = "ColorPicker"
@@ -3176,24 +3164,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Toggle.Title.Text = ToggleSettings.Name
 			Toggle.Visible = true
 			Toggle.Parent = TabPage
-			Toggle.ClipsDescendants = true
 		
 			Toggle.BackgroundTransparency = 1
 			Toggle.UIStroke.Transparency = 1
 			Toggle.Title.TextTransparency = 1
 			Toggle.Switch.BackgroundColor3 = SelectedTheme.ToggleBackground
-		
-			local Sample = Instance.new("ImageLabel")
-			Sample.Name = "Sample"
-			Sample.Parent = Toggle
-			Sample.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			Sample.BackgroundTransparency = 1
-			Sample.Image = "http://www.roblox.com/asset/?id=4560909609"
-			Sample.ImageColor3 = SelectedTheme.ToggleEnabled
-			Sample.ImageTransparency = 1
-			Sample.Size = UDim2.new(0, 0, 0, 0)
-			Sample.AnchorPoint = Vector2.new(0.5, 0.5)
-			Sample.ZIndex = 5
 		
 			if SelectedTheme ~= RayfieldLibrary.Theme.Default then
 				Toggle.Switch.Shadow.Visible = false
@@ -3216,66 +3191,67 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 		
 			Toggle.MouseEnter:Connect(function()
-				TweenService:Create(Toggle, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
+				TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
 			end)
 		
 			Toggle.MouseLeave:Connect(function()
-				TweenService:Create(Toggle, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+				TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
 			end)
 		
-			local function UpdateToggleState(isEnabled)
-				if isEnabled then
-					ToggleSettings.CurrentValue = true
-					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-						Position = UDim2.new(1, -20, 0.5, 0)
-					}):Play()
-					TweenService:Create(Toggle.Switch.Indicator.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleEnabledStroke}):Play()
-					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundColor3 = SelectedTheme.ToggleEnabled}):Play()
-					TweenService:Create(Toggle.Switch.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleEnabledOuterStroke}):Play()
-				else
-					ToggleSettings.CurrentValue = false
-					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-						Position = UDim2.new(1, -40, 0.5, 0)
-					}):Play()
-					TweenService:Create(Toggle.Switch.Indicator.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleDisabledStroke}):Play()
-					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundColor3 = SelectedTheme.ToggleDisabled}):Play()
-					TweenService:Create(Toggle.Switch.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleDisabledOuterStroke}):Play()
-				end
+			local function CreateRipple(toggleElement, position)
+				local Ripple = Instance.new("ImageLabel")
+				Ripple.Name = "Ripple"
+				Ripple.Image = "http://www.roblox.com/asset/?id=4560909609"
+				Ripple.BackgroundTransparency = 1
+				Ripple.ImageColor3 = SelectedTheme.ToggleEnabled
+				Ripple.ImageTransparency = 0.6
+				Ripple.Size = UDim2.new(0, 0, 0, 0)
+				Ripple.Position = UDim2.new(0, position.X - toggleElement.AbsolutePosition.X, 0, position.Y - toggleElement.AbsolutePosition.Y)
+				Ripple.AnchorPoint = Vector2.new(0.5, 0.5)
+				Ripple.ZIndex = 5
+				Ripple.Parent = toggleElement
+		
+				local maxSize = math.max(toggleElement.AbsoluteSize.X, toggleElement.AbsoluteSize.Y) * 2
+				TweenService:Create(Ripple, TweenInfo.new(0.6, Enum.EasingStyle.Quart), {
+					Size = UDim2.new(0, maxSize, 0, maxSize),
+					Position = UDim2.new(0.5, 0, 0.5, 0),
+					ImageTransparency = 1
+				}):Play()
+		
+				game:GetService("Debris"):AddItem(Ripple, 0.6)
 			end
 		
 			Toggle.MouseButton1Down:Connect(function()
 				local mouse = game:GetService("Players").LocalPlayer:GetMouse()
-				local absolutePos = Toggle.AbsolutePosition
-				local absoluteSize = Toggle.AbsoluteSize
-				
-				local x = (mouse.X - absolutePos.X) / absoluteSize.X
-				local y = (mouse.Y - absolutePos.Y) / absoluteSize.Y
-				
-				local ripple = Sample:Clone()
-				ripple.Parent = Toggle
-				ripple.ImageTransparency = 0.6
-				ripple.Position = UDim2.new(x, 0, y, 0)
-				ripple.Size = UDim2.new(0, 0, 0, 0)
-				
-				local maxSize = math.max(absoluteSize.X, absoluteSize.Y) * 1.2
-				local targetSize = UDim2.new(0, maxSize, 0, maxSize)
-				local targetPosition = UDim2.new(x, -maxSize/2, y, -maxSize/2)
-				
-				TweenService:Create(ripple, TweenInfo.new(0.6, Enum.EasingStyle.Quart), {
-					Size = targetSize,
-					Position = targetPosition,
-					ImageTransparency = 1
-				}):Play()
-				
-				game:GetService("Debris"):AddItem(ripple, 0.6)
+				CreateRipple(Toggle, Vector2.new(mouse.X, mouse.Y))
 			end)
 		
-			Toggle.MouseButton1Click:Connect(function()
-				local newValue = not ToggleSettings.CurrentValue
-				UpdateToggleState(newValue)
+			Toggle.Interact.MouseButton1Click:Connect(function()
+				if ToggleSettings.CurrentValue == true then
+					ToggleSettings.CurrentValue = false
+					TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
+					TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.45, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = UDim2.new(1, -40, 0.5, 0)}):Play()
+					TweenService:Create(Toggle.Switch.Indicator.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleDisabledStroke}):Play()
+					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundColor3 = SelectedTheme.ToggleDisabled}):Play()
+					TweenService:Create(Toggle.Switch.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleDisabledOuterStroke}):Play()
+					TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+					TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()	
+				else
+					ToggleSettings.CurrentValue = true
+					TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
+					TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = UDim2.new(1, -20, 0.5, 0)}):Play()
+					TweenService:Create(Toggle.Switch.Indicator.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleEnabledStroke}):Play()
+					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundColor3 = SelectedTheme.ToggleEnabled}):Play()
+					TweenService:Create(Toggle.Switch.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleEnabledOuterStroke}):Play()
+					TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+					TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()		
+				end
 		
 				local Success, Response = pcall(function()
 					if debugX then warn('Running toggle \''..ToggleSettings.Name..'\' (Interact)') end
+		
 					ToggleSettings.Callback(ToggleSettings.CurrentValue)
 				end)
 		
@@ -3297,10 +3273,35 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end)
 		
 			function ToggleSettings:Set(NewToggleValue)
-				UpdateToggleState(NewToggleValue)
+				if NewToggleValue == true then
+					ToggleSettings.CurrentValue = true
+					TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
+					TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = UDim2.new(1, -20, 0.5, 0)}):Play()
+					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0,12,0,12)}):Play()
+					TweenService:Create(Toggle.Switch.Indicator.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleEnabledStroke}):Play()
+					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundColor3 = SelectedTheme.ToggleEnabled}):Play()
+					TweenService:Create(Toggle.Switch.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleEnabledOuterStroke}):Play()
+					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.45, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0,17,0,17)}):Play()	
+					TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+					TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()	
+				else
+					ToggleSettings.CurrentValue = false
+					TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
+					TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.45, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = UDim2.new(1, -40, 0.5, 0)}):Play()
+					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0,12,0,12)}):Play()
+					TweenService:Create(Toggle.Switch.Indicator.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleDisabledStroke}):Play()
+					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundColor3 = SelectedTheme.ToggleDisabled}):Play()
+					TweenService:Create(Toggle.Switch.UIStroke, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Color = SelectedTheme.ToggleDisabledOuterStroke}):Play()
+					TweenService:Create(Toggle.Switch.Indicator, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0,17,0,17)}):Play()
+					TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+					TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()	
+				end
 		
 				local Success, Response = pcall(function()
 					if debugX then warn('Running toggle \''..ToggleSettings.Name..'\' (:Set)') end
+		
 					ToggleSettings.Callback(ToggleSettings.CurrentValue)
 				end)
 		
@@ -3331,7 +3332,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 		
 			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
 				Toggle.Switch.BackgroundColor3 = SelectedTheme.ToggleBackground
-				Sample.ImageColor3 = SelectedTheme.ToggleEnabled
 		
 				if SelectedTheme ~= RayfieldLibrary.Theme.Default then
 					Toggle.Switch.Shadow.Visible = false
